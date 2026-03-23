@@ -1,0 +1,274 @@
+🔵 14️⃣ Selection Search Methods (Feature Selection)
+
+Feature Selection is an important topic in Machine Learning & Pattern Recognition exams.
+
+👉 It selects relevant features and removes irrelevant/redundant ones.
+
+If number of features = d, search space size = 2ᵈ subsets
+This causes Curse of Dimensionality.
+
+🔷 What is Curse of Dimensionality?
+
+When features increase:
+
+Data becomes sparse
+
+Distance measures become unreliable
+
+Model overfits
+
+Computation increases exponentially
+
+Example:
+If d = 20
+Possible subsets = 2²⁰ = 1,048,576
+
+So intelligent search methods are needed.
+
+🔶 1️⃣ Exhaustive Search
+🔹 Definition:
+
+Searches all possible feature subsets.
+
+🔹 Procedure:
+
+Generate all 2ᵈ subsets
+
+Evaluate each using criterion J
+
+Select subset with best score
+
+🔹 Example:
+
+Features = {F1, F2, F3}
+
+Subsets:
+{ }, {F1}, {F2}, {F3},
+{F1,F2}, {F1,F3}, {F2,F3},
+{F1,F2,F3}
+
+Evaluate all → Choose best.
+
+🔹 Advantages:
+
+✔ Finds optimal solution
+
+🔹 Disadvantages:
+
+❌ Computationally expensive
+❌ Not possible for large d
+
+🔶 2️⃣ Branch and Bound (B&B)
+🔹 Idea:
+
+Avoid evaluating all subsets by pruning bad branches.
+
+🔹 Uses Monotonicity:
+
+If evaluation function J is monotonic:
+
+If subset S is bad → all supersets of S are bad.
+
+🔹 Example:
+
+If J({F1,F2}) < threshold
+Then no need to check:
+{F1,F2,F3}, {F1,F2,F4}, etc.
+
+🔹 Advantages:
+
+✔ Faster than exhaustive
+✔ Still optimal (if monotonic)
+
+🔹 Disadvantages:
+
+❌ Requires monotonic criterion
+❌ Complex implementation
+
+🔶 3️⃣ Sequential Forward Selection (SFS)
+🔹 Procedure:
+
+Start with empty set {}
+
+Add feature giving best improvement
+
+Repeat until stopping condition
+
+🔹 Example:
+
+Features: F1, F2, F3
+
+Step 1:
+Check F1, F2, F3 individually
+Choose best → say F2
+
+Step 2:
+Check {F2,F1}, {F2,F3}
+Choose best
+
+Continue...
+
+🔹 Nesting Effect:
+
+Once feature added → cannot remove later
+May get stuck in local optimum
+
+🔹 Advantages:
+
+✔ Simple
+✔ Fast
+
+🔹 Disadvantages:
+
+❌ Not optimal
+❌ Nesting problem
+
+🔶 4️⃣ Sequential Backward Selection (SBS)
+🔹 Procedure:
+
+Start with all features
+
+Remove worst feature
+
+Repeat
+
+🔹 Example:
+
+Start: {F1,F2,F3,F4}
+
+Remove F3 (worst)
+
+Now evaluate removing from remaining 3 features
+
+🔹 Advantages:
+
+✔ Works better when important features are many
+
+🔹 Disadvantages:
+
+❌ Computationally heavier than SFS
+❌ Nesting problem still exists
+
+🔶 5️⃣ Sequential Floating Forward Selection (SFFS)
+
+Improved version of SFS.
+
+🔹 Idea:
+
+After adding feature → check if removing any improves performance.
+
+🔹 Dynamic Add/Remove:
+
+Forward step
+Backward step
+Repeat dynamically
+
+🔹 Advantages:
+
+✔ Avoids nesting problem
+✔ Better accuracy than SFS/SBS
+✔ Good trade-off
+
+🔹 Disadvantages:
+
+❌ Slightly complex
+
+🔶 6️⃣ Genetic Algorithm (GA)
+
+Evolution-based global search.
+
+Inspired by natural selection.
+
+🔹 Representation:
+
+Binary chromosome
+
+Example:
+[1 0 1 1 0]
+
+1 → feature selected
+0 → feature not selected
+
+🔹 Operations:
+
+Selection
+
+Crossover
+
+Mutation
+
+Fitness evaluation
+
+🔹 Advantages:
+
+✔ Global search
+✔ Avoids local optimum
+✔ Good for large feature space
+
+🔹 Disadvantages:
+
+❌ Computationally expensive
+❌ Requires parameter tuning
+
+🔷 Comparison Table (Exam Ready)
+Method	Optimal	Speed	Nesting Problem	Suitable For
+Exhaustive	✔ Yes	Very Slow	No	Small d
+Branch & Bound	✔ Yes	Medium	No	Moderate d
+SFS	❌ No	Fast	Yes	Large d
+SBS	❌ No	Medium	Yes	Medium d
+SFFS	❌ Near Optimal	Medium	No	Practical use
+Genetic Algorithm	Near Optimal	Slow	No	Very large d
+🔷 Importance in Exam (Write These Points)
+
+✔ Reduces overfitting
+✔ Improves model generalization
+✔ Reduces computational cost
+✔ Removes irrelevant & redundant features
+✔ Improves interpretability
+✔ Handles curse of dimensionality
+
+🔷 Extra Theory (For 10–15 Marks Question)
+🔹 Types of Feature Selection
+
+Filter Methods
+
+Based on statistical measures
+
+Independent of classifier
+
+Example: Correlation, Chi-square
+
+Wrapper Methods
+
+Uses classifier to evaluate subsets
+
+More accurate but slow
+
+Above search methods belong here
+
+Embedded Methods
+
+Feature selection inside training
+
+Example: LASSO
+
+🔷 Simple Real-Life Example
+
+Suppose predicting student performance:
+
+Features:
+
+Attendance
+
+Study hours
+
+Height
+
+Blood group
+
+Previous marks
+
+Height & Blood group are irrelevant.
+
+Feature selection removes them →
+Better accuracy + faster training.

@@ -1,0 +1,680 @@
+/* =====================================================
+   FORCE VOICE LOAD (STEP 3 – REQUIRED FOR STABILITY)
+===================================================== */
+window.speechSynthesis.onvoiceschanged = () => {};
+
+
+/* =====================================================
+   GLOBAL STATE
+===================================================== */
+let voiceEnabled = true;
+let recognition = null;
+let recognitionStarted = false;
+let userInteracted = false;
+let pendingUpload = null; // "image" | "video"
+
+
+/* =====================================================
+   USER INTERACTION UNLOCK (BROWSER SECURITY)
+===================================================== */
+document.addEventListener(
+  "click",
+  () => {
+    userInteracted = true;
+  },
+  { once: true }
+);
+
+
+/* =====================================================
+   ROBOTIC TEXT TO SPEECH (FINAL)
+===================================================== */
+function speak(text) {
+  if (!voiceEnabled || !userInteracted) return;
+  if (!("speechSynthesis" in window)) return;
+
+  speechSynthesis.cancel();
+
+  const msg = new SpeechSynthesisUtterance(text);
+
+  // 🤖 ROBOTIC / NEURAL VOICE SETTINGS
+  msg.rate = 0.85;   // slower = machine-like
+  msg.pitch = 0.7;   // deep robotic tone
+  msg.volume = 1.0;
+
+  // Prefer high-quality system voices
+  const voices = speechSynthesis.getVoices();
+  const roboticVoice = voices.find(v =>
+    v.name.includes("Google") ||
+    v.name.includes("Microsoft") ||
+    v.name.includes("Neural")
+  );
+  if (roboticVoice) msg.voice = roboticVoice;
+
+  speechSynthesis.speak(msg);
+}
+
+
+/* =====================================================
+   PROCESSING VISUAL + AI START SOUND
+===================================================== */
+function showProcessing() {
+  const loader = document.getElementById("ai-loading");
+  const startSound = document.getElementById("aiStartSound");
+
+  if (loader) loader.style.display = "flex";
+
+  if (startSound && userInteracted) {
+    startSound.pause();
+    startSound.currentTime = 0;
+    startSound.loop = true;
+    startSound.volume = 0.45;
+    startSound.play().catch(() => {});
+  }
+}
+
+function hideProcessing() {
+  const loader = document.getElementById("ai-loading");
+  const startSound = document.getElementById("aiStartSound");
+
+  if (loader) loader.style.display = "none";
+
+  if (startSound) {
+    startSound.pause();
+    startSound.currentTime = 0;
+    startSound.loop = false;
+  }
+}
+
+
+/* =====================================================
+   GREETING (ONCE PER SESSION – ROBOTIC)
+===================================================== */
+window.addEventListener("load", () => {
+  if (!sessionStorage.getItem("greeted")) {
+    setTimeout(() => {
+      speak(
+        "Welcome Siddharth. Neural network initialized. Ready for detection."
+      );
+    }, 1200);
+    sessionStorage.setItem("greeted", "true");
+  }
+});
+
+
+/* =====================================================
+   FORM SUBMIT HANDLER (IMAGE / VIDEO)
+===================================================== */
+document.querySelectorAll("form").forEach(form => {
+  form.addEventListener("submit", () => {
+    const fileInput = form.querySelector("input[type='file']");
+    if (!fileInput || !fileInput.files.length) return;
+
+    showProcessing();
+    speak("Neural network is processing.");
+  });
+});
+
+
+/* =====================================================
+   RESULT PAGE HANDLER (VIDEO COMPLETE)
+===================================================== */
+window.addEventListener("load", () => {
+  if (document.querySelector("video")) {
+    hideProcessing();
+
+    const doneSound = document.getElementById("aiDoneSound");
+    if (doneSound && userInteracted) {
+      doneSound.volume = 0.6;
+      doneSound.play().catch(() => {});
+    }
+
+    speak("Processing completed successfully.");
+  }
+});
+
+
+/* =====================================================
+   MANUAL FILE PICKERS (BROWSER SAFE)
+===================================================== */
+function openImagePicker() {
+  const input = document.getElementById("imageInput");
+  if (input) input.click();
+}
+
+function openVideoPicker() {
+  const input = document.getElementById("videoInput");
+  if (input) input.click();
+}
+
+
+/* =====================================================
+   VOICE COMMAND ENGINE (FINAL & SAFE)
+===================================================== */
+function startVoiceCommands() {
+  if (!("webkitSpeechRecognition" in window) || !userInteracted) return;
+
+  recognition = new webkitSpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = false;
+  recognition.lang = "en-US";
+
+  recognition.onstart = () => {
+    recognitionStarted = true;
+    speak("Voice commands activated.");
+    console.log("🎙 Voice recognition ON");
+  };
+
+  recognition.onerror = e => {
+    console.warn("Voice error:", e.error);
+  };
+
+  recognition.onend = () => {
+    recognitionStarted = false;
+    if (document.visibilityState === "visible") {
+      setTimeout(startVoiceCommands, 1000);
+    }
+  };
+
+  recognition.onresult = e => {
+    const cmd =
+      e.results[e.results.length - 1][0]
+        .transcript.toLowerCase().trim();
+
+    console.log("🎙 Command:", cmd);
+
+    const video = document.querySelector("video");
+
+    /* ---------- IMAGE UPLOAD ---------- */
+    if (cmd.includes("upload image")) {
+      pendingUpload = "image";
+      speak("Image upload ready. Say confirm upload or click choose image.");
+      document.getElementById("imageCard")?.classList.add("highlight");
+    }
+
+    /* ---------- VIDEO UPLOAD ---------- */
+    else if (cmd.includes("upload video")) {
+      pendingUpload = "video";
+      speak("Video upload ready. Say confirm upload or click choose video.");
+      document.getElementById("videoCard")?.classList.add("highlight");
+    }
+
+    /* ---------- CONFIRM UPLOAD ---------- */
+    else if (cmd.includes("confirm upload")) {
+      if (pendingUpload === "image") openImagePicker();
+      if (pendingUpload === "video") openVideoPicker();
+      speak("Opening file manager.");
+      pendingUpload = null;
+    }
+
+    /* ---------- VIDEO CONTROL ---------- */
+    else if (cmd.includes("play video")) {
+      if (video) {
+        video.play();
+        speak("Playing video.");
+      }
+    }
+
+    else if (cmd.includes("stop video")) {
+      if (video) {
+        video.pause();
+        speak("Video stopped.");
+      }
+    }
+
+    /* ---------- WEBCAM ---------- */
+    else if (cmd.includes("start webcam")) {
+      speak("Starting webcam detection.");
+      window.location.href = "/webcam";
+    }
+
+    else if (cmd.includes("stop detection")) {
+      speak("Stopping detection.");
+      window.location.href = "/dashboard";
+    }
+
+    /* ---------- VOICE TOGGLE ---------- */
+    else if (cmd.includes("mute voice")) {
+      voiceEnabled = false;
+      speechSynthesis.cancel();
+      console.log("🔇 Voice muted");
+    }
+
+    else if (cmd.includes("unmute voice")) {
+      voiceEnabled = true;
+      speak("Voice enabled.");
+    }
+  };
+
+  recognition.start();
+}
+
+
+/* =====================================================
+   START VOICE COMMANDS AFTER FIRST CLICK
+===================================================== */
+document.addEventListener(
+  "click",
+  () => {
+    if (!recognitionStarted) startVoiceCommands();
+  },
+  { once: true }
+);
+
+
+/* =====================================================
+   WEBCAM CAPTURE → IMAGE UPLOAD
+===================================================== */
+function captureFrame() {
+  const img = document.getElementById("liveCam");
+  const canvas = document.getElementById("canvas");
+  const fileInput = document.getElementById("capturedFile");
+  const form = document.getElementById("captureForm");
+
+  if (!img || !canvas || !fileInput || !form) {
+    alert("Webcam not ready.");
+    return;
+  }
+
+  if (!img.complete || img.naturalWidth === 0) {
+    alert("Webcam feed not ready yet.");
+    return;
+  }
+
+  showProcessing();
+
+  const ctx = canvas.getContext("2d");
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  ctx.drawImage(img, 0, 0);
+
+  canvas.toBlob(blob => {
+    if (!blob) {
+      hideProcessing();
+      alert("Capture failed.");
+      return;
+    }
+
+    const file = new File([blob], "webcam.jpg", { type: "image/jpeg" });
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    fileInput.files = dt.files;
+    form.submit();
+  }, "image/jpeg", 0.95);
+}
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enhanced YOLOv9 AI Dashboard</title>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="navbar">
+  Enhanced YOLOv9 Real-World Object Detection System
+</header>
+
+<!-- ================= MAIN CONTAINER ================= -->
+<div class="container">
+
+  <!-- ================= IMAGE UPLOAD ================= -->
+  <div class="card" id="imageCard">
+    <h2>📷 Upload Image</h2>
+
+    <form action="/run" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="mode" value="image">
+
+      <!-- REAL FILE INPUT -->
+      <input
+        type="file"
+        id="imageInput"
+        name="file"
+        accept="image/*"
+        required
+        hidden
+      >
+
+      <!-- USER GESTURE BUTTON -->
+      <button type="button" onclick="openImagePicker()">
+        Choose Image
+      </button>
+
+      <br><br>
+
+      <button type="submit">
+        Run Detection
+      </button>
+    </form>
+  </div>
+
+  <!-- ================= VIDEO UPLOAD ================= -->
+  <div class="card" id="videoCard">
+    <h2>🎥 Upload Video</h2>
+
+    <form action="/run" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="mode" value="video">
+
+      <!-- REAL FILE INPUT -->
+      <input
+        type="file"
+        id="videoInput"
+        name="file"
+        accept="video/*"
+        required
+        hidden
+      >
+
+      <!-- USER GESTURE BUTTON -->
+      <button type="button" onclick="openVideoPicker()">
+        Choose Video
+      </button>
+
+      <br><br>
+
+      <button type="submit">
+        Run Detection
+      </button>
+    </form>
+  </div>
+
+  <!-- ================= LIVE WEBCAM ================= -->
+  <div class="card">
+    <h2>📡 Live Webcam Detection</h2>
+
+    <img
+      id="liveCam"
+      src="/webcam"
+      alt="Live Webcam Stream"
+      style="width:100%; border-radius:12px;"
+      onerror="this.alt='Webcam unavailable';"
+    >
+
+    <br><br>
+
+    <button type="button" onclick="captureFrame()">
+      📸 Capture & Detect
+    </button>
+
+    <!-- Hidden canvas -->
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <!-- Hidden upload form -->
+    <form
+      id="captureForm"
+      action="/run"
+      method="post"
+      enctype="multipart/form-data"
+      style="display:none;"
+    >
+      <input type="hidden" name="mode" value="image">
+      <input type="file" name="file" id="capturedFile">
+    </form>
+  </div>
+
+</div>
+
+<!-- ================= PROJECT INFO ================= -->
+<section class="project-info">
+
+  <h1 class="animated-title">
+    AI-Powered Enhanced Object Detection
+  </h1>
+
+  <p class="typing-text" id="typing"></p>
+
+  <div class="stats">
+    <div class="stat-box">
+      <h2 class="counter" data-target="80">80</h2>
+      <p>Real-World Classes</p>
+    </div>
+
+    <div class="stat-box">
+      <h2 class="counter" data-target="160">160</h2>
+      <p>FPS Inference</p>
+    </div>
+
+    <div class="stat-box">
+      <h2 class="counter" data-target="99">99</h2>
+      <p>% Detection Reliability*</p>
+    </div>
+  </div>
+
+  <div class="pipeline">
+    <span>Image / Video</span> ➡
+    <span>Enhancement</span> ➡
+    <span>YOLOv9 AI</span> ➡
+    <span>Detection + Tracking</span>
+  </div>
+
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  © 2026 | Enhanced YOLOv9 AI System
+</footer>
+
+<!-- ================= AI LOADING OVERLAY ================= -->
+<div id="ai-loading">
+  <div class="nn-loader">
+    <span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+  </div>
+  <p> Neural Network is Processing…</p>
+</div>
+
+<!-- ================= AI AUDIO ================= -->
+<audio id="aiStartSound" src="/static/sounds/ai_start.mp3" preload="auto"></audio>
+<audio id="aiDoneSound" src="/static/sounds/ai_done.mp3" preload="auto"></audio>
+
+<!-- ================= JS ================= -->
+<script src="/static/js/animation.js"></script>
+
+</body>
+</html>
+ -- updated --
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enhanced YOLOv9 Neural Vision</title>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="navbar">
+  Enhanced YOLOv9 Neural Vision System
+  <p style="font-size:13px; opacity:0.85;">
+    Real-time • Voice-aware • AI-powered perception
+  </p>
+</header>
+
+<!-- ================= MAIN CONTAINER ================= -->
+<div class="container">
+
+  <!-- ================= IMAGE UPLOAD ================= -->
+  <div class="card" id="imageCard">
+    <h2>📷 Image Analysis</h2>
+
+    <p class="card-desc">
+      Feed a single frame into the AI brain.<br>
+      Objects are identified instantly.
+    </p>
+
+    <form action="/run" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="mode" value="image">
+
+      <input
+        type="file"
+        id="imageInput"
+        name="file"
+        accept="image/*"
+        hidden
+        required
+      >
+
+      <button type="button" onclick="openImagePicker()">
+        Choose Image
+      </button>
+
+      <br><br>
+
+      <button type="submit">
+        Run Detection
+      </button>
+    </form>
+  </div>
+
+  <!-- ================= VIDEO UPLOAD ================= -->
+  <div class="card" id="videoCard">
+    <h2>🎥 Video Intelligence</h2>
+
+    <p class="card-desc">
+      Motion is broken into frames.<br>
+      Each frame is processed by deep neural vision.
+    </p>
+
+    <form action="/run" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="mode" value="video">
+
+      <input
+        type="file"
+        id="videoInput"
+        name="file"
+        accept="video/*"
+        hidden
+        required
+      >
+
+      <button type="button" onclick="openVideoPicker()">
+        Choose Video
+      </button>
+
+      <br><br>
+
+      <button type="submit">
+        Run Detection
+      </button>
+    </form>
+  </div>
+
+  <!-- ================= LIVE WEBCAM ================= -->
+  <div class="card">
+    <h2>📡 Live Neural Perception</h2>
+
+    <p class="card-desc">
+      Reality → Camera → AI Brain.<br>
+      Watch the system think in real time.
+    </p>
+
+    <img
+      id="liveCam"
+      src="/webcam"
+      alt="Live Webcam Stream"
+      style="width:100%; border-radius:12px;"
+      onerror="this.alt='Webcam unavailable';"
+    >
+
+    <br><br>
+
+    <button type="button" onclick="captureFrame()">
+      📸 Capture & Analyze
+    </button>
+
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <form
+      id="captureForm"
+      action="/run"
+      method="post"
+      enctype="multipart/form-data"
+      style="display:none;"
+    >
+      <input type="hidden" name="mode" value="image">
+      <input type="file" name="file" id="capturedFile">
+    </form>
+  </div>
+
+</div>
+
+<!-- ================= AI STATUS SECTION ================= -->
+<section class="project-info">
+
+  <h1 class="animated-title">
+    Neural Vision Core
+  </h1>
+
+  <p style="text-align:center; max-width:720px; margin:auto; opacity:0.9;">
+    This system does not process files.<br>
+    It interprets the physical world using artificial intelligence.
+  </p>
+
+  <div class="pipeline">
+    <span>INPUT STREAM</span> ➜
+    <span>NEURAL ENHANCER</span> ➜
+    <span>YOLOv9 CORE</span> ➜
+    <span>REALITY MAPPED</span>
+  </div>
+
+  <div class="stats">
+    <div class="stat-box">
+      <h2 class="counter" data-target="80">80</h2>
+      <p>Object Categories</p>
+    </div>
+
+    <div class="stat-box">
+      <h2 class="counter" data-target="160">160</h2>
+      <p>Frames / Second</p>
+    </div>
+
+    <div class="stat-box">
+      <h2 class="counter" data-target="1">1</h2>
+      <p>Unified AI Brain</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  Enhanced YOLOv9 Neural Vision System  
+  <br>
+  Seeing the world through artificial intelligence
+</footer>
+
+<!-- ================= AI LOADING OVERLAY ================= -->
+<div id="ai-loading">
+  <div class="nn-loader">
+    <span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+  </div>
+  <p> Neural Network Processing…</p>
+</div>
+
+<!-- ================= AI AUDIO ================= -->
+<audio id="aiStartSound" src="/static/sounds/ai_start.mp3" preload="auto"></audio>
+<audio id="aiDoneSound" src="/static/sounds/ai_done.mp3" preload="auto"></audio>
+
+<!-- ================= JS ================= -->
+<script src="/static/js/animation.js"></script>
+
+</body>
+</html>
+ 

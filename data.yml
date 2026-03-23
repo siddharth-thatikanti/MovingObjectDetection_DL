@@ -1,0 +1,348 @@
+path: dataset/kitti
+train: images/train
+val: images/val
+
+nc: 3
+names:
+  0: Car
+  1: Pedestrian
+  2: Cyclist
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enhanced YOLOv9 AI Dashboard</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="navbar">
+  🚀 Enhanced YOLOv9 Real-World Object Detection System
+</header>
+
+<!-- ================= MAIN CARDS ================= -->
+<div class="container">
+
+  <!-- IMAGE -->
+  <div class="card">
+    <h2>📷 Upload Image</h2>
+    <form action="/run" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="mode" value="image">
+      <input type="file" name="file" required>
+      <button type="submit">Run Detection</button>
+    </form>
+  </div>
+
+  <!-- VIDEO -->
+  <div class="card">
+    <h2>🎥 Upload Video</h2>
+    <form action="/run" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="mode" value="video">
+      <input type="file" name="file" required>
+      <button type="submit">Run Detection</button>
+    </form>
+  </div>
+
+  <!-- WEBCAM -->
+  <div class="card">
+    <h2>📡 Live Webcam</h2>
+    <a href="/webcam">
+      <button>Start Webcam</button>
+    </a>
+  </div>
+
+</div>
+
+<!-- ================= PROJECT DESCRIPTION ================= -->
+<section class="project-info">
+
+  <h1 class="animated-title">
+    AI-Powered Enhanced Object Detection
+  </h1>
+
+  <p class="typing-text" id="typing"></p>
+
+  <!-- ================= STATS ================= -->
+  <div class="stats">
+
+    <div class="stat-box">
+      <h2 class="counter" data-target="80">0</h2>
+      <p>Real-World Classes</p>
+    </div>
+
+    <div class="stat-box">
+      <h2 class="counter" data-target="160">0</h2>
+      <p>FPS Inference</p>
+    </div>
+
+    <div class="stat-box">
+      <h2 class="counter" data-target="99">0</h2>
+      <p>% Detection Reliability*</p>
+    </div>
+
+  </div>
+
+  <!-- ================= PIPELINE ================= -->
+  <div class="pipeline">
+    <span>🎥 Video / Image</span>
+    <span>➡</span>
+    <span>✨ Enhancement</span>
+    <span>➡</span>
+    <span>🧠 YOLOv9 AI</span>
+    <span>➡</span>
+    <span>📦 Detection + Tracking</span>
+  </div>
+
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  © 2026 | Enhanced YOLOv9 AI System | Real-Time Video Intelligence
+</footer>
+
+<!-- ================= JS ================= -->
+<script>
+/* ================= TYPING EFFECT ================= */
+const text =
+  "A real-time enhanced YOLOv9 system designed to detect people, animals, vehicles, and everyday objects from real-world images and videos using motion-aware preprocessing and intelligent tracking.";
+
+let index = 0;
+const typingElement = document.getElementById("typing");
+
+function typeEffect() {
+  if (index < text.length) {
+    typingElement.innerHTML += text.charAt(index);
+    index++;
+    setTimeout(typeEffect, 35);
+  }
+}
+typeEffect();
+
+/* ================= COUNTER EFFECT ================= */
+const counters = document.querySelectorAll(".counter");
+
+counters.forEach(counter => {
+  const updateCounter = () => {
+    const target = +counter.dataset.target;
+    const current = +counter.innerText;
+    const increment = target / 100;
+
+    if (current < target) {
+      counter.innerText = Math.ceil(current + increment);
+      setTimeout(updateCounter, 25);
+    } else {
+      counter.innerText = target;
+    }
+  };
+  updateCounter();
+});
+</script>
+
+</body>
+</html>
+-----
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #0b0f1a;
+  color: white;
+}
+
+.bg-video {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.overlay {
+  text-align: center;
+  margin-top: 20%;
+}
+
+.glow-text {
+  font-size: 3rem;
+  color: cyan;
+  text-shadow: 0 0 20px cyan;
+  animation: pulse 2s infinite;
+}
+
+.typing {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  animation: blink 1s infinite;
+}
+
+.loader {
+  margin: 30px auto;
+  width: 60px;
+  height: 60px;
+  border: 6px solid #333;
+  border-top: 6px solid cyan;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { text-shadow: 0 0 10px cyan; }
+  50% { text-shadow: 0 0 30px cyan; }
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  padding: 80px;
+}
+
+.card {
+  background: rgba(255,255,255,0.08);
+  padding: 30px;
+  border-radius: 15px;
+  backdrop-filter: blur(15px);
+  width: 260px;
+  transition: 0.4s;
+}
+
+.card:hover {
+  transform: translateY(-15px) scale(1.05);
+  box-shadow: 0 0 30px cyan;
+}
+
+button {
+  background: cyan;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #00ffee;
+}
+
+/* ================= PROJECT INFO SECTION ================= */
+
+.project-info {
+  margin-top: 80px;
+  text-align: center;
+  animation: fadeUp 1.5s ease;
+}
+
+.animated-title {
+  font-size: 2.5rem;
+  color: cyan;
+  text-shadow: 0 0 25px cyan;
+  animation: glow 2s infinite alternate;
+}
+
+.typing-text {
+  margin-top: 20px;
+  font-size: 1.3rem;
+  color: #c9faff;
+  min-height: 40px;
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.stat-box {
+  background: rgba(255,255,255,0.08);
+  padding: 25px;
+  border-radius: 15px;
+  width: 180px;
+  backdrop-filter: blur(10px);
+  transition: 0.4s;
+}
+
+.stat-box:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 0 25px cyan;
+}
+
+.stat-box h2 {
+  font-size: 2.2rem;
+  color: cyan;
+}
+
+/* Pipeline */
+.pipeline {
+  margin-top: 50px;
+  font-size: 1.2rem;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  animation: slide 8s linear infinite;
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 10px cyan; }
+  to { text-shadow: 0 0 30px cyan; }
+}
+
+@keyframes slide {
+  0% { opacity: 0.2; }
+  50% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+---
+/* ================= TYPING EFFECT ================= */
+const text = 
+  "An enhanced video-based AI system capable of detecting people, animals, vehicles, and real-world objects using YOLOv9 with motion-aware enhancement and real-time tracking.";
+
+let index = 0;
+const typingElement = document.getElementById("typing");
+
+function typeEffect() {
+  if (index < text.length) {
+    typingElement.innerHTML += text.charAt(index);
+    index++;
+    setTimeout(typeEffect, 40);
+  }
+}
+
+typeEffect();
+
+/* ================= COUNTER ANIMATION ================= */
+const counters = document.querySelectorAll(".counter");
+
+counters.forEach(counter => {
+  const update = () => {
+    const target = +counter.dataset.target;
+    const current = +counter.innerText;
+    const increment = target / 100;
+
+    if (current < target) {
+      counter.innerText = Math.ceil(current + increment);
+      setTimeout(update, 30);
+    } else {
+      counter.innerText = target;
+    }
+  };
+  update();
+});

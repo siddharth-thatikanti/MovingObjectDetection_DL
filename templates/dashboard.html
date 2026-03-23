@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enhanced YOLOv9 Neural Vision</title>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="navbar">
+  Enhanced YOLOv9 Neural Vision System
+  <p style="font-size:13px; opacity:0.85;">
+    Real-time • Voice-aware • AI-powered perception
+  </p>
+</header>
+
+<!-- ================= MAIN CONTAINER ================= -->
+<div class="container">
+
+  <!-- ================= IMAGE UPLOAD ================= -->
+  <div class="card" id="imageCard">
+    <h2>📷 Image Analysis</h2>
+
+    <p class="card-desc">
+      Feed a single frame into the AI brain.<br>
+      Objects are identified instantly.
+    </p>
+
+    <form action="/run" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="mode" value="image">
+
+      <input
+        type="file"
+        id="imageInput"
+        name="file"
+        accept="image/*"
+        hidden
+        required
+      >
+
+      <button type="button" onclick="openImagePicker()">
+        Choose Image
+      </button>
+
+      <br><br>
+
+      <button type="submit">
+        Run Detection
+      </button>
+    </form>
+  </div>
+
+  <!-- ================= VIDEO UPLOAD ================= -->
+  <div class="card" id="videoCard">
+    <h2>🎥 Video Intelligence</h2>
+
+    <p class="card-desc">
+      Motion is broken into frames.<br>
+      Each frame is processed by deep neural vision.
+    </p>
+
+    <form action="/run" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="mode" value="video">
+
+      <input
+        type="file"
+        id="videoInput"
+        name="file"
+        accept="video/*"
+        hidden
+        required
+      >
+
+      <button type="button" onclick="openVideoPicker()">
+        Choose Video
+      </button>
+
+      <br><br>
+
+      <button type="submit">
+        Run Detection
+      </button>
+    </form>
+  </div>
+
+  <!-- ================= LIVE WEBCAM ================= -->
+  <div class="card">
+    <h2>📡 Live Neural Perception</h2>
+
+    <p class="card-desc">
+      Reality → Camera → AI Brain.<br>
+      Watch the system think in real time.
+    </p>
+
+    <img
+      id="liveCam"
+      src="/webcam"
+      alt="Live Webcam Stream"
+      style="width:100%; border-radius:12px;"
+      onerror="this.alt='Webcam unavailable';"
+    >
+
+    <br><br>
+
+    <button type="button" onclick="captureFrame()">
+      📸 Capture & Analyze
+    </button>
+
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <form
+      id="captureForm"
+      action="/run"
+      method="post"
+      enctype="multipart/form-data"
+      style="display:none;"
+    >
+      <input type="hidden" name="mode" value="image">
+      <input type="file" name="file" id="capturedFile">
+    </form>
+  </div>
+
+</div>
+
+<!-- ================= AI STATUS SECTION ================= -->
+<section class="project-info">
+
+  <h1 class="animated-title">
+    Neural Vision Core
+  </h1>
+
+  <p style="text-align:center; max-width:720px; margin:auto; opacity:0.9;">
+    This system does not process files.<br>
+    It interprets the physical world using artificial intelligence.
+  </p>
+
+  <div class="pipeline">
+    <span>INPUT STREAM</span> ➜
+    <span>NEURAL ENHANCER</span> ➜
+    <span>YOLOv9 CORE</span> ➜
+    <span>REALITY MAPPED</span>
+  </div>
+
+  <div class="stats">
+    <div class="stat-box">
+      <h2 class="counter" data-target="80">80</h2>
+      <p>Object Categories</p>
+    </div>
+
+    <div class="stat-box">
+      <h2 class="counter" data-target="160">160</h2>
+      <p>Frames / Second</p>
+    </div>
+
+    <div class="stat-box">
+      <h2 class="counter" data-target="1">1</h2>
+      <p>Unified AI Brain</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  Enhanced YOLOv9 Neural Vision System  
+  <br>
+  Seeing the world through artificial intelligence
+</footer>
+
+<!-- ================= AI LOADING OVERLAY ================= -->
+<div id="ai-loading">
+  <div class="nn-loader">
+    <span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+  </div>
+  <p> Neural Network Processing…</p>
+</div>
+
+<!-- ================= AI AUDIO ================= -->
+<audio id="aiStartSound" src="/static/sounds/ai_start.mp3" preload="auto"></audio>
+<audio id="aiDoneSound" src="/static/sounds/ai_done.mp3" preload="auto"></audio>
+
+<!-- ================= JS ================= -->
+<script src="/static/js/animation.js"></script>
+
+</body>
+</html>
+ 

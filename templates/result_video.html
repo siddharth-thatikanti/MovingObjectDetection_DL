@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Detection Output</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+    video {
+      width: 80%;
+      margin-top: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 30px #00ffd5;
+    }
+    .btn {
+      margin: 20px;
+      padding: 12px 25px;
+      background: #00ffd5;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🎬 Detection Output</h1>
+
+<video controls preload="auto">
+  <source src="{{ video_url }}" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+<br>
+
+<a href="{{ video_url }}" download>
+  <button class="btn">⬇ Download Detected Video</button>
+</a>
+
+<a href="/dashboard">
+  <button class="btn">⬅ Back to Dashboard</button>
+</a>
+
+</body>
+</html>

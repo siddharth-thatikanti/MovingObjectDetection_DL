@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enhanced YOLOv9 AI Dashboard</title>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<header class="navbar">
+    Enhanced YOLOv9 Real-World Object Detection System
+</header>
+
+<div class="container">
+
+  <!-- IMAGE UPLOAD -->
+  <div class="card">
+    <h2>📷 Upload Image</h2>
+    <form action="/run" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="mode" value="image">
+      <input type="file" name="file" accept="image/*" required>
+      <button type="submit">Run Detection</button>
+    </form>
+  </div>
+
+  <!-- VIDEO UPLOAD -->
+  <div class="card">
+    <h2>🎥 Upload Video</h2>
+    <form action="/run" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="mode" value="video">
+      <input type="file" name="file" accept="video/*" required>
+      <button type="submit">Run Detection</button>
+    </form>
+  </div>
+
+  <!-- LIVE WEBCAM -->
+  <div class="card">
+    <h2>📡 Live Webcam Detection</h2>
+
+    <!-- Live stream -->
+    <img
+      id="liveCam"
+      src="/webcam"
+      loading="lazy"
+      alt="Live Webcam Stream"
+      style="width:100%; border-radius:12px;"
+      onerror="this.alt='Webcam unavailable';"
+    >
+
+    <br><br>
+
+    <!-- Capture -->
+    <button type="button" onclick="captureFrame()">📸 Capture & Detect</button>
+
+    <!-- Hidden canvas -->
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <!-- Hidden upload form (used by JS) -->
+    <form id="captureForm" action="/run" method="post" enctype="multipart/form-data" style="display:none;">
+      <input type="hidden" name="mode" value="image">
+      <input type="file" name="file" id="capturedFile">
+    </form>
+  </div>
+
+</div>
+
+<!-- PROJECT INFO -->
+<section class="project-info">
+  <h1 class="animated-title">AI-Powered Enhanced Object Detection</h1>
+  <p class="typing-text" id="typing"></p>
+
+  <div class="stats">
+    <div class="stat-box">
+      <h2 class="counter" data-target="80">0</h2>
+      <p>Real-World Classes</p>
+    </div>
+    <div class="stat-box">
+      <h2 class="counter" data-target="160">0</h2>
+      <p>FPS Inference</p>
+    </div>
+    <div class="stat-box">
+      <h2 class="counter" data-target="99">0</h2>
+      <p>% Detection Reliability*</p>
+    </div>
+  </div>
+
+  <div class="pipeline">
+    <span>Image / Video</span> ➡
+    <span>Enhancement</span> ➡
+    <span>YOLOv9 AI</span> ➡
+    <span>Detection + Tracking</span>
+  </div>
+</section>
+
+<footer class="footer">
+  © 2026 | Enhanced YOLOv9 AI System
+</footer>
+
+<!-- AI LOADING OVERLAY -->
+<div id="ai-loading">
+  <div class="nn-loader">
+    <span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+  </div>
+  <p>⚙️ Neural Network Processing…</p>
+</div>
+
+<!-- JS (contains typing, counters, loader, webcam capture) -->
+<script src="/static/js/animation.js"></script>
+
+</body>
+</html>

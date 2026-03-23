@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Welcome | AI Detection System</title>
+
+<style>
+body {
+  margin: 0;
+  background: black;
+  overflow: hidden;
+}
+
+video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+}
+
+#overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  color: cyan;
+  font-size: 2rem;
+  cursor: pointer;
+  text-shadow: 0 0 20px cyan;
+}
+</style>
+</head>
+
+<body>
+
+<video id="introVideo">
+  <source src="/static/video/welcome.mp4" type="video/mp4">
+</video>
+
+<div id="overlay">
+  ▶ CLICK TO START EXPERIENCE
+</div>
+
+<script>
+const video = document.getElementById("introVideo");
+const overlay = document.getElementById("overlay");
+
+overlay.addEventListener("click", () => {
+  overlay.style.display = "none";
+  video.muted = false;
+  video.play();
+});
+
+/* Redirect when video finishes */
+video.onended = () => {
+  window.location.href = "/dashboard";
+};
+</script>
+
+</body>
+</html>
